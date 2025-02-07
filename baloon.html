@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balloon Exercise</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: beige;
+            font-family: 'Raleway', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            color: #2c3e50;
+        }
+        /* Navbar Styles */
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.navbar a {
+    margin: 0 1rem;
+    padding: 0.8rem 1.5rem;
+    color: #2c3e50;
+    text-decoration: none;
+    font-weight: 600;
+    font-family: 'Raleway', sans-serif;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.navbar a:hover {
+    background-color: #f5f5f5;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.navbar a.active {
+    background-color: #3498db;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+        h1, h2 {
+            font-family: 'Playfair Display', serif;
+            color: #2c3e50;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+
+        /* Instruction box styling */
+        .instructions-box {
+            width: 90%;
+            max-width: 600px;
+            background-color: #f9f9f9;
+            border: 2px solid #2c3e50;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            font-size: 1rem;
+            color: #2c3e50;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: left;
+        }
+
+        .instructions-box h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        /* Center container styling */
+        .center-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        /* Video feed styling */
+        #videoFeed {
+            width: 80%;
+            max-width: 600px;
+            height: auto;
+            border: 4px solid #2c3e50;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        /* Balloon styling */
+        #balloon, .other-balloons {
+            width: 50px;
+            height: 100px;
+            border-radius: 25px;
+            position: absolute;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+
+        #balloon {
+            background-color: blue; /* Target blue balloon */
+        }
+
+        .other-balloons {
+            background-color: green; /* Default color for other balloons */
+        }
+
+        /* Button styles */
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            margin: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        button:active {
+            background-color: #1f6b99;
+        }
+
+        /* Floating message styling */
+        #floating-message {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            #videoFeed {
+                width: 90%;
+            }
+
+            button {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('thrataka') }}">Thrataka</a>
+        <a href="{{ url_for('saccades') }}">Saccades</a>
+        <a href="{{ url_for('balloon') }}" class="active">Balloon</a>
+        <a href="{{ url_for('testing') }}">Testing</a>
+    </div>
+    <h1>Balloon Eye Exercise</h1>
+
+    <div class="instructions-box" id="instructions-box">
+        <h3>Instructions for Balloon Exercise</h3>
+        <p>Sit comfortably and focus on the screen.</p>
+        <p>Click "Start Balloon Exercise" to begin.</p>
+        <p>Follow only the <strong>blue balloon</strong> with your eyes as it moves around.</p>
+        <p>Ignore the other balloons as distractions.</p>
+        <p>Click "Stop Balloon Exercise" to end the exercise.</p>
+        <p>Rest your eyes by focusing on a stationary object afterward.</p>
+    </div>
+
+    <button id="agreeButton" onclick="agreeAndStartExercise()">I've read the instructions, Start Balloon Exercise</button>
+
+    <div class="center-container" id="exercise-components" style="display: none;">
+        <h2>Iris Tracking Feed:</h2>
+        <img id="videoFeed" src="{{ url_for('video_feed') }}" alt="Iris Tracking Video Feed">
+
+        <!-- Target blue balloon -->
+        <div id="balloon"></div>
+
+        <!-- Multiple other balloons (distractors) -->
+        <div class="other-balloons" id="balloon1"></div>
+        <div class="other-balloons" id="balloon2"></div>
+        <div class="other-balloons" id="balloon3"></div>
+        <div class="other-balloons" id="balloon4"></div>
+        <div class="other-balloons" id="balloon5"></div>
+
+        <button onclick="stopBalloon()">Stop Balloon Exercise</button>
+    </div>
+
+    <script>
+        let exerciseStarted = false;
+        let balloonInterval;
+
+        function agreeAndStartExercise() {
+            document.getElementById("instructions-box").style.display = "none";
+            document.getElementById("agreeButton").style.display = "none";
+            document.getElementById("exercise-components").style.display = "flex";
+            startBalloon();
+        }
+
+        function startBalloon() {
+            if (exerciseStarted) return;
+
+            exerciseStarted = true;
+            let balloons = [document.getElementById("balloon")];
+            let otherBalloons = document.getElementsByClassName("other-balloons");
+
+            for (let i = 0; i < otherBalloons.length; i++) {
+                balloons.push(otherBalloons[i]);
+            }
+
+            balloons.forEach(balloon => {
+                balloon.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+                balloon.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+                balloon.velocityX = (Math.random() * 4 + 1) * (Math.random() < 0.5 ? 1 : -1);
+                balloon.velocityY = (Math.random() * 4 + 1) * (Math.random() < 0.5 ? 1 : -1);
+            });
+
+            balloonInterval = setInterval(() => {
+                balloons.forEach(balloon => {
+                    let balloonX = parseFloat(balloon.style.left);
+                    let balloonY = parseFloat(balloon.style.top);
+
+                    balloonX += balloon.velocityX;
+                    balloonY += balloon.velocityY;
+
+                    if (balloonX < 0 || balloonX > window.innerWidth - 50) {
+                        balloon.velocityX *= -1;
+                    }
+                    if (balloonY < 0 || balloonY > window.innerHeight - 100) {
+                        balloon.velocityY *= -1;
+                    }
+
+                    balloon.style.left = balloonX + 'px';
+                    balloon.style.top = balloonY + 'px';
+                });
+            }, 30);
+        }
+
+        function stopBalloon() {
+            clearInterval(balloonInterval);
+            exerciseStarted = false;
+            alert("Balloon exercise stopped.");
+        }
+    </script>
+
+</body>
+</html>

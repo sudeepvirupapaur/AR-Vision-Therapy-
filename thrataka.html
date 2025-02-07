@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thrataka Eye Exercise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        /* Navbar Styles */
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.navbar a {
+    margin: 0 1rem;
+    padding: 0.8rem 1.5rem;
+    color: #2c3e50;
+    text-decoration: none;
+    font-weight: 600;
+    font-family: 'Raleway', sans-serif;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.navbar a:hover {
+    background-color: #f5f5f5;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.navbar a.active {
+    background-color: #3498db;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: beige;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #2c3e50;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            text-align: center;
+        }
+        .instructions-box {
+            width: 90%;
+            max-width: 600px;
+            background-color: #f9f9f9;
+            border: 2px solid #2c3e50;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            font-size: 1rem;
+            color: #2c3e50;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .instructions-box h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 15px 10px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        #videoFeed, #focusDot, #countdown, #stopButton {
+            display: none;
+        }
+        #videoFeed {
+            width: 100%;
+            max-width: 550px;
+            height: auto;
+            margin-top: 20px;
+            border: 2px solid #2c3e50;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        #focusDot {
+            width: 20px;
+            height: 20px;
+            background-color: black;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #countdown {
+            margin-top: 20px;
+            font-size: 1.6rem;
+            color: #e74c3c;
+            font-weight: 700;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .instructions-box h2 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('thrataka') }}" class="active">Thrataka</a>
+        <a href="{{ url_for('saccades') }}">Saccades</a>
+        <a href="{{ url_for('balloon') }}">Balloon</a>
+        <a href="{{ url_for('testing') }}">Testing</a>
+    </div>
+    <h1>Thrataka Eye Exercise</h1>
+
+    <div class="instructions-box" id="instructions-box">
+        <h2>Instructions for Thrataka</h2>
+        <p>Sit comfortably and focus on the screen.</p>
+        <p>Click "Start Exercise" to begin.</p>
+        <p>Focus steadily on the black dot in the center of the screen without blinking.</p>
+        <p>Relax and avoid moving your eyes from the dot until the timer completes.</p>
+        <p>An alert will notify you when the exercise is finished; take a moment to rest your eyes afterward.</p>
+    </div>
+
+    <button id="agreeButton" onclick="agreeAndStartExercise()">I've agreed to Instructions, Start Exercise</button>
+
+    <div id="exercise-components" style="display: none;">
+        <label for="timer">Select Timer:</label>
+        <select id="timer">
+            <option value="30">30s</option>
+            <option value="45">45s</option>
+            <option value="60">60s</option>
+        </select>
+        <button onclick="startExercise()">Start Exercise</button>
+        <button id="stopButton" onclick="stopExercise()">Stop Exercise</button>
+
+        <!-- Iris Tracking Video Feed -->
+        <img id="videoFeed" src="{{ url_for('video_feed') }}" alt="Iris Tracking Video Feed">
+        
+        <!-- Dot for focus -->
+        <div id="focusDot"></div>
+        
+        <!-- Timer display -->
+        <h2 id="countdown"></h2>
+    </div>
+
+    <script>
+        let countdownInterval;
+
+        function agreeAndStartExercise() {
+            document.getElementById("instructions-box").style.display = "none";
+            document.getElementById("agreeButton").style.display = "none";
+            document.getElementById("exercise-components").style.display = "block";
+            document.getElementById("videoFeed").style.display = "block";
+            document.getElementById("stopButton").style.display = "inline-block";
+        }
+
+        function startExercise() {
+            const time = document.getElementById("timer").value;
+            const focusDot = document.getElementById("focusDot");
+            const countdown = document.getElementById("countdown");
+
+            focusDot.style.display = "block";
+            let remainingTime = time;
+
+            countdown.textContent = `Time remaining: ${remainingTime}s`;
+            countdown.style.display = "block";
+
+            countdownInterval = setInterval(function () {
+                remainingTime--;
+                countdown.textContent = `Time remaining: ${remainingTime}s`;
+
+                if (remainingTime <= 0) {
+                    clearInterval(countdownInterval);
+                    focusDot.style.display = "none";
+                    countdown.textContent = "";
+                    countdown.style.display = "none";
+                    alert("Thrataka exercise complete!");
+                }
+            }, 1000);
+        }
+
+        function stopExercise() {
+            clearInterval(countdownInterval);
+            document.getElementById("focusDot").style.display = "none";
+            document.getElementById("countdown").textContent = "";
+            document.getElementById("countdown").style.display = "none";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saccades Exercise</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: beige;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            color: #2c3e50;
+        }
+        /* Navbar Styles */
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.navbar a {
+    margin: 0 1rem;
+    padding: 0.8rem 1.5rem;
+    color: #2c3e50;
+    text-decoration: none;
+    font-weight: 600;
+    font-family: 'Raleway', sans-serif;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.navbar a:hover {
+    background-color: #f5f5f5;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.navbar a.active {
+    background-color: #3498db;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+        .instructions-box {
+            width: 85%;
+            max-width: 500px;
+            background-color: #f9f9f9;
+            border: 2px solid #2c3e50;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px auto;
+            font-size: 0.9rem;
+            color: #2c3e50;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: left;
+        }
+
+        .instructions-box h3 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+
+        button, select {
+            padding: 8px 15px;
+            margin: 8px;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        #videoFeed {
+            width: 50vw;
+            max-width: 500px;
+            height: auto;
+            border: 2px solid #2c3e50;
+            margin-top: 15px;
+            display: none;
+        }
+
+        #moving-object {
+            width: 2.5vw;
+            height: 2.5vw;
+            max-width: 40px;
+            max-height: 40px;
+            background-color: red;
+            position: absolute;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: none;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="navbar">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('thrataka') }}">Thrataka</a>
+        <a href="{{ url_for('saccades') }}" class="active">Saccades</a>
+        <a href="{{ url_for('balloon') }}">Balloon</a>
+        <a href="{{ url_for('testing') }}">Testing</a>
+    </div>
+    <h1>Saccades Eye Exercise</h1>
+
+    <div class="instructions-box" id="instructions-box">
+        <h3>Instructions for Saccades Exercise</h3>
+        <p>Sit comfortably, ensuring a clear view of the screen.</p>
+        <p>Click "I've read the instructions, start exercise" to begin.</p>
+        <p>Follow the red moving object with just your eyes.</p>
+        <p>Adjust the speed if desired using the dropdown menu.</p>
+        <p>Click "Stop Saccades Exercise" to finish.</p>
+    </div>    
+
+    <button id="start-button" onclick="agreeAndStartExercise()">I've read the instructions, start exercise</button>
+
+    <div id="exercise-components" style="display: none;">
+        <img id="videoFeed" src="{{ url_for('video_feed') }}" alt="Iris Tracking Video Feed">
+        <label for="speed">Select Speed:</label>
+        <select id="speed" onchange="updateSpeed()">
+            <option value="1000">1 Second</option>
+            <option value="700">0.7 Seconds</option>
+            <option value="500">0.5 Seconds</option>
+        </select>
+        <button onclick="stopSaccades()">Stop Saccades Exercise</button>
+        <div id="moving-object"></div>
+    </div>
+
+    <script>
+        let speed = 1000;
+        let exerciseStarted = false;
+        let interval;
+
+        function agreeAndStartExercise() {
+            document.getElementById("instructions-box").style.display = "none";
+            document.getElementById("start-button").style.display = "none";
+            document.getElementById("exercise-components").style.display = "block";
+            document.getElementById("videoFeed").style.display = "block";
+            startSaccades();
+        }
+
+        function updateSpeed() {
+            speed = parseInt(document.getElementById("speed").value);
+            if (exerciseStarted) {
+                clearInterval(interval);
+                startSaccades();
+            }
+        }
+
+        function startSaccades() {
+            exerciseStarted = true;
+            let object = document.getElementById("moving-object");
+            object.style.display = 'block';
+
+            interval = setInterval(() => {
+                let windowWidth = window.innerWidth;
+                let windowHeight = window.innerHeight;
+                let objectWidth = object.offsetWidth;
+                let objectHeight = object.offsetHeight;
+
+                let randomX = Math.random() * (windowWidth - objectWidth);
+                let randomY = Math.random() * (windowHeight - objectHeight);
+
+                object.style.left = randomX + 'px';
+                object.style.top = randomY + 'px';
+            }, speed);
+        }
+
+        function stopSaccades() {
+            clearInterval(interval);
+            exerciseStarted = false;
+            document.getElementById("moving-object").style.display = 'none';
+        }
+    </script>
+</body>
+</html>
